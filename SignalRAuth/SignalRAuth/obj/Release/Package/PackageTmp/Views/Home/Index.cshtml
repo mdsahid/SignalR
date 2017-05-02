@@ -1,0 +1,62 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<br />
+<br />
+<div class="row">
+
+    <div class="col-md-9">
+        <div class="pull-left">
+            <input class="form-control" type="text" id="txt" />
+            <button class="btn btn-primary" id="btn">Send</button>
+            <br />
+            <div id="messages">
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div style="color:red" id="disconnectUser" class="pull-right"></div>
+        <br />
+        <div id="totalUser" class="pull-right"></div>
+    </div>
+</div>
+
+
+
+@section scripts{
+    
+<script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script src="http://172.16.185.52/MyChatApp/Signalr/js"></script>
+    <script>
+
+        $(function () {
+            
+            var app = $.connection.myHub;
+            
+            $.connection.hub.start().done(function () {
+                $('#btn').click(function () {
+                    var userMsg = $('#txt').val();
+                    app.server.send(userMsg);
+                    $('#txt').val('');
+                })
+            }).fail(function (err) {
+                alert(err.message);
+            })
+
+            app.client.notifyUser = function (n, t) {
+                $('#totalUser').prepend(n + ' - ' + t + '<br/>');
+            }
+            app.client.notifyDisconnectUser = function (n) {
+                $('#disconnectUser').html(n);
+            }
+            app.client.SendMessages = function (n, t) {
+                $('#messages').prepend(n + ' - ' + t + '<br/>');
+            }
+        })
+        
+
+    </script>
+
+    }
